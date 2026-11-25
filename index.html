@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>East Africa Holiday Planner</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>East Africa Holiday Planner</h1>
+    <p>Plan your perfect holiday! Location, Schedule, Duration... you name it, we got it.</p>
+  </header>
+  <main>
+    <section class="panel">
+      <label for="country">Country</label>
+      <select id="country">
+        <option value="RW">Rwanda</option>
+        <option value="KE">Kenya</option>
+        <option value="UG">Uganda</option>
+        <option value="TZ">Tanzania</option>
+        <option value="BI">Burundi</option>
+        <option value="SS">South Sudan</option>
+        <option value="CD">DR Congo</option>
+        <option value="SO">Somalia</option>
+      </select>
+      <label for="year">Year</label>
+      <input type="number" id="year" value="2026">
+      <button id="loadButton">Show holidays</button>
+    </section>
+    <section class="panel" id="filters" hidden>
+      <label for="search">Search by name</label>
+      <input type="text" id="search" placeholder="e.g. heroes">
+      <label for="month">Month</label>
+      <select id="month">
+        <option value="0">All months</option>
+        <option value="1">January</option>
+        <option value="2">February</option>
+        <option value="3">March</option>
+        <option value="4">April</option>
+        <option value="5">May</option>
+        <option value="6">June</option>
+        <option value="7">July</option>
+        <option value="8">August</option>
+        <option value="9">September</option>
+        <option value="10">October</option>
+        <option value="11">November</option>
+        <option value="12">December</option>
+      </select>
+      <label for="sort">Sort by</label>
+      <select id="sort">
+        <option value="dateAsc">Date (earliest first)</option>
+        <option value="dateDesc">Date (latest first)</option>
+        <option value="nameAsc">Name (A to Z)</option>
+      </select>
+    </section>
+    <p id="message"></p>
+    <div class="table-wrap">
+      <table id="results" hidden>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Day</th>
+            <th>Holiday</th>
+            <th>Type</th>
+            <th>Days to go</th>
+          </tr>
+        </thead>
+        <tbody id="resultsBody"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <footer>Holiday data from <a href="https://calendarific.com">Calendarific</a>.</a></footer>
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

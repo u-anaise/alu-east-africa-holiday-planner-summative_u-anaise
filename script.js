@@ -68,3 +68,64 @@ async function fetchFromApi(country, year) {
   }
   return list;
 }
+
+function readSaved(key) {
+  try {
+    var saved = localStorage.getItem(key);
+    if (saved) {
+      return JSON.parse (saved);
+    }
+  } catch (error) {
+
+  }
+  return null;
+}
+
+function saveCopy (key, list) {
+  try {
+    localStorage.setItem(key, JSON.stringify(list));
+  } catch(error) {
+
+  }
+}
+
+async function loadHolidays() {
+  var country = countrySelect.value;
+  var year = Number(yearInput.value);
+
+  if(!Number.isInteger(year) || year<2000 || year>2100) {
+    showMessage("Please enter a year between 2000 and 2100.", true);
+    return;
+  }
+  if (typeof API_KEY === "undefined" || API_KEY === "PUT_YOUR_KEY_HERE") {
+    showMessage("No API key found. Copy config.example.js to config.js and add your key.", true);
+    return;
+  }
+  var key = "holidays-" + country  + "-" + year;
+  currentLabel = countrySelect.options[countrySelect.selectedIndex].text + " in " + year;
+  var list=readSaved(key);
+  var fromSaved= (list !== null);
+  if(!fromSaved) {
+    showMessage("Loading holidays...", false);
+    loadButton.disabled = true;
+    try {
+      list = await fetchFromApi(country, year);
+      saveCopy(key, list);
+    } catch (error) {
+      showMessage(error.message, true);
+      loadButton.disabled = false;
+      return;
+    }
+    loadButton.disabled = false;
+  }
+  if (list.length === 0) {
+    allHolidays = [];
+    filters.hidden=true;
+    table.hidden= true;
+    showMessage("No holidays were found for " + currentLabel + ".", false);
+    return;
+  }
+  allHolidays = list;
+  filters.hidden = false;
+  showTable();
+}

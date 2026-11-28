@@ -6,7 +6,7 @@ var yearInput=document.getElementById("year");
 var loadButton=document.getElementById("loadButton");
 var filters=document.getElementById("filters");
 var searchInput=document.getElementById("search");
-var monthSelect=document.getElementById("month")
+var monthSelect=document.getElementById("month");
 var sortSelect=document.getElementById("sort");
 var messageBox=document.getElementById("message");
 var table=document.getElementById("results");
@@ -129,3 +129,97 @@ async function loadHolidays() {
   filters.hidden = false;
   showTable();
 }
+
+function compareByDate(a, b) {
+  if (a.iso < b.iso) {
+    return -1;
+  }
+  if(a.iso > b.iso) {
+    return 1;
+  }
+  return 0;
+}
+
+function addCell(row, text) {
+  var cell=document.createElement("td");
+  cell.textContent = text;
+  row.appendChild(cell);
+  return cell;
+}
+
+function daysToGo(holiday, today) {
+  var date = new Date(holiday.year, holiday.month - 1, holiday.day);
+  var diff = Math.round((date - today)/86400000);
+  if (diff<0) {
+    return "Passed";
+  }
+  if (diff === 0) {
+    return "Today";
+  }
+  return String(diff);
+}
+
+function showTable() {
+  var search = searchInput.value.trim().toLowerCase();
+  var month=Number(monthSelect.value);
+  var shown=[];
+  for(var i=0; i<allHolidays.length; i++) {
+    var h=allHolidays[i];
+    var nameMatches=h.name.toLowerCase().includes(search);
+    var monthMatches=(month === 0 || h.month === month);
+    if (nameMatches && monthMatches) {
+      shown.push(h);
+    }
+  }
+
+  var sortChoice = sortSelect.value;
+  if (sortChoice === "dateAsc") {
+    shown.sort(compareByDate);
+  } else if(sortChoice === "dateDesc") {
+    shown.sort(function (a,b) {
+      return compareByDate(b, a);
+    });
+  } else {
+    shown.sort(function (a,b) {
+      return a.name.localeCompare(b.name);
+    });
+  }
+
+  tableBody.textContent = "";
+
+  if (shown.length === 0) {
+    table.hidden = true;
+    showMessage("No holidays match your search or filter.", false);
+    return;
+  }
+
+  var now = new Date();
+  var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  for (var j=0; j<shown.length; j++) {
+    var holiday = shown[j];
+    var date= new Date(holiday.year, holiday.month -1, holiday.day);
+    var weekday = date.getDay();
+
+    var row= document.createElement("tr");
+    addCell(row, holiday.iso);
+    addCell(row, dayNames[weekday]);
+    var nameCell = addCell(row, holiday.name);
+    if (weekday === 1 || weekday === 5) {
+      var tag = document.createElement("span");
+      tag.className = "tag";
+      tag.textContent = "Long weekend";
+      nameCell.appendChild(tag);
+    }
+    addCell(row, holiday.type);
+    addCell(row, daysToGo(holiday, today));
+    tableBody.appendChild(row);
+  }
+  table.hidden = false;
+  showMessage("Showing " + shown.length + " of " + allHolidays.length + " holidays for " + currentLabel + ".", false);
+}
+
+loadButton.addEventListener("click", loadHolidays);
+searchInput.addEventListener("input", showTable);
+monthSelect.addEventListener("change", showTable);
+sortSelect.addEventListener("change", showTable);
